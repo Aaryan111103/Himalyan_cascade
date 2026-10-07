@@ -1,0 +1,321 @@
+Install Python: Make sure you have Python
+installed on your laptop.
+Open your Terminal (or Command Prompt) and
+run this single command to install the tools you
+need:
+
+pip install streamlit folium streamlit-folium
+pandas scikit-learn
+
+Open a code editor (like VS Code, PyCharm,
+or Jupyter Notebook).
+
+Step 2: Build a Working App First (30 Minutes)
+Instead of worrying about complex satellites or
+AI right now, build a basic web app first. Once
+you see a real map on your screen, everything
+else becomes much easier!
+
+Create a file named app.py on your computer.
+Copy and paste this exact starter code into
+app.py:
+1.
+
+1.
+2.
+
+import folium
+import streamlit as st
+from streamlit_folium import st_folium
+
+1. Title of your app
+
+st.title('⛰️ HimalayaCascade AI')
+st.write('Early Warning System for Landslides &
+Flash Floods')
+
+2. Interactive Rain Slider
+
+rainfall = st.slider('Select Rainfall Level (mm)', 0,
+300, 50)
+
+3. Simple Rule logic (If rain >
+150mm -> Danger!)
+
+if rainfall > 150:
+st.error('🚨 HIGH RISK: Landslide & River
+Blockage Predicted!')
+st.warning('⚡ Flash Flood Wave Arrival Time: 45
+Minutes')
+else:
+st.success('✅ Risk Level Normal')
+
+4. Display a Map of Chamoli,
+Himalayas
+
+m = folium.Map(location=[30.48, 79.33],
+zoom_start=11)
+
+Add a marker on the map
+
+folium.Marker(
+[30.48, 79.33],
+
+popup='Monitoring Station 1',
+icon=folium.Icon(color='red' if rainfall > 150 else
+'green'),
+).add_to(m)
+
+st_folium(m, width=700, height=450)
+
+Open your terminal in the same folder and type:
+streamlit run app.py
+import folium
+import streamlit as st
+from streamlit_folium import st_folium
+
+Import the math/logic functions
+from cascade_engine.py
+
+from cascade_engine import
+calculate_landslide_risk,
+evaluate_cascade_hazard
+
+1. PAGE CONFIGURATION
+
+st.set_page_config(page_title="HimalayaCascad
+e AI", layout="wide")
+
+st.title("⛰️ HimalayaCascade AI: Multi-Hazard
+Early Warning System")
+st.write(
+"Simulating cascading mountain disasters:
+Landslide ➔ River Blockage ➔ Flash Flood"
+)
+
+2. SIDEBAR CONTROLS (User
+Inputs)
+
+st.sidebar.header("⚙️ Environmental Inputs")
+
+Interactive sliders for triggers
+
+rainfall_mm = st.sidebar.slider("24-Hour Rainfall
+(mm)", 0, 300, 120, step=10)
+slope_deg = st.sidebar.slider("Terrain Slope
+(Degrees)", 10, 60, 38)
+seismic_val = st.sidebar.slider("Seismic Activity
+(0 = Low, 3 = High)", 0, 3, 1)
+
+Distance to downstream
+population center
+
+town_distance_km = st.sidebar.number_input(
+"Distance to Downstream Town (km)", value=22
+)
+
+3. RUN CALCULATIONS (Calling
+Stage 2 Logic)
+
+risk_score = calculate_landslide_risk(
+
+slope_degrees=slope_deg,
+rainfall_mm=rainfall_mm,
+seismic_index=seismic_val
+)
+
+Assume river proximity is 100
+meters for this monitoring point
+
+cascade_results = evaluate_cascade_hazard(
+landslide_risk=risk_score,
+distance_to_town_km=town_distance_km,
+river_proximity_meters=100,
+)
+
+4. DASHBOARD LAYOUT (2
+Columns)
+
+col1, col2 = st.columns([3, 2])
+
+LEFT COLUMN: Interactive Map
+
+with col1:
+st.subheader("🗺️ Real-Time Spatial Risk Map")
+
+Center map on Chamoli region,
+Himalayas
+
+map_center = [30.48, 79.33]
+m = folium.Map(location=map_center,
+zoom_start=11, tiles="OpenStreetMap")
+
+Color logic based on risk score
+
+marker_color = (
+"red"
+if risk_score > 0.65
+
+else "orange"
+if risk_score > 0.35
+else "green"
+)
+
+Landslide Monitoring Point Marker
+
+folium.CircleMarker(
+location=[30.48, 79.33],
+radius=15,
+popup=f"Landslide Susceptibility Index:
+{risk_score * 100}%",
+color=marker_color,
+fill=True,
+fill_opacity=0.7,
+).add_to(m)
+
+Draw Cascading Flood Path if
+
+River Blockage Occurs
+
+if cascade_results["river_blocked"]:
+# Blockage Marker
+folium.Marker(
+location=[30.47, 79.34],
+popup="⚠️ RIVER CHANNEL BLOCKED (Natural
+Dam Formed)",
+icon=folium.Icon(color="black", icon="warning"),
+).add_to(m)
+
+# Downstream Flood Wave Trajectory Line
+river_path = [[30.47, 79.34], [30.44, 79.37], [30.40,
+79.41]]
+folium.PolyLine(
+locations=river_path,
+color="blue",
+weight=5,
+opacity=0.8,
+tooltip="Predicted Flash Flood Wave Path",
+
+).add_to(m)
+
+Display the map inside Streamlit
+
+st_folium(m, width="100%", height=450)
+
+RIGHT COLUMN: Alert Metrics &
+Status
+
+with col2:
+st.subheader("🚨 Early Warning Metrics")
+
+Metric Display for Landslide Risk
+
+st.metric(
+label="Landslide Risk Index",
+value=f"{risk_score * 100:.0f}%",
+delta=(
+
+"HIGH RISK"
+if risk_score > 0.65
+else "MODERATE"
+if risk_score > 0.35
+else "LOW"
+),
+delta_color="inverse" if risk_score > 0.65 else
+"normal",
+)
+
+st.divider()
+
+Dynamic Cascade Alert Box
+
+if cascade_results["river_blocked"]:
+st.error(cascade_results["flood_warning"])
+
+st.metric(
+label="⏱️ Flash Flood Arrival Countdown",
+
+value=f"{cascade_results['wave_arrival_mins']}
+Minutes",
+)
+
+st.warning(
+"Action Plan: Notify Local Disaster Management
+Authority (NDMA) to"
+" evacuate downstream sectors immediately."
+)
+else:
+st.success("✅ River Channel Clear. No
+cascading flood hazard detected.")
+
+st.divider()
+st.markdown("Municipality Action Readiness:")
+st.json({
+"Target Municipality": "Chamoli Sector 3",
+"Evacuation Protocol": (
+"ACTIVE - LEVEL 3"
+if cascade_results["river_blocked"]
+
+else "STANDBY"
+),
+"Estimated Lead Time": (
+f"{cascade_results['wave_arrival_mins']} mins"
+if cascade_results["river_blocked"]
+else "N/A"
+),
+})
+Sidebar Inputs (st.sidebar.slider): Creates
+dynamic controls on the left side. Adjusting the
+rainfall slider recalculated all risks in real time.
+Connecting Stage 2 (cascade_engine.py):
+Imports your functions at the top and runs
+calculations instantly as inputs change.
+Map Setup (folium): Draws an interactive map. If
+the risk passes 65%, a black warning icon
+appears over the river along with a blue line
+marking the flood wave trajectory.
+Alert Cards (st.metric & st.error): Shows clear
+numerical risk scores and flash flood wave
+
+arrival time countdowns for disaster authorities
+
+When you sit down with your laptop, save this
+code as app.py in the same directory as
+cascade_engine.py and execute:
+streamlit run app.py
+Pre-compute Sample Scenarios: Create 2 or 3
+quick pre-set buttons on your Streamlit sidebar:
+
+Button 1: "Normal Weather Scenario"
+(50mm rain)
+Button 2: "Chamoli 2021 Re-enactment"
+(220mm rain + high risk + 40-min flood
+wave countdown)
+
+Local Fallbacks: Ensure all map tiles and
+calculations can run 100% locally on your
+machine without relying on external satellite
+connections during your 3-minute pitch.
+
+Push your code (app.py,
+cascade_engine.py, requirements.txt).
+
+Write a clean README.md file with a
+screenshot of your working dashboard
+and 3 bullet points explaining how to run it.
+Record a 2-Minute Screen Recording Video:
+Record a quick video of your screen using
+OBS or Loom while demonstrating the app
+sliders and map. (Most hackathons
+require a video link in case live judging
+runs out of time).
+Practice Your Pitch:
+Rehearse your pitch at least 3 times out
+loud with a timer set to 3 minutes.
+
+What to focus on right now?
+Since you don't have your laptop at this second,
+start drafting the text for your slide deck on your
+phone's notes app! When you get to your laptop,
+you can jump straight into testing the code and
+building the slides.

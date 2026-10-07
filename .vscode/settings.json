@@ -1,0 +1,8 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^cd \"c:\\\\Users\\\\aarya\\\\OneDrive\\\\Desktop\\\\Himalyan_cascade\" ; python -m compileall \"HimalayaCascade_AI\" ; python - <<PY\nimport sys\nsys\\.path\\.insert\\(0, r\"c:\\\\Users\\\\aarya\\\\OneDrive\\\\Desktop\\\\Himalyan_cascade\\\\HimalayaCascade_AI\"\\)\nfrom cascade_engine import calculate_landslide_risk, evaluate_cascade_hazard\nprint\\('risk=', calculate_landslide_risk\\(42, 180, 1\\.8\\)\\)\nprint\\('hazard=', evaluate_cascade_hazard\\(0\\.8, 20, 100\\)\\)\nPY$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
+}

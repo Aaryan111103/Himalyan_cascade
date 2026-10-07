@@ -1,0 +1,47 @@
+Based on the code provided, the prototype includes *8 primary functional features*:
+
+### 1. Interactive Parameter Controls (st.sidebar)
+
+* *Real-Time Sliders:* Controls for *24-Hour Rainfall (0–300 mm), **Terrain Slope (10–60°), and **Seismic Activity (Index 0–3)* allowing instant recalculation of risk.
+* *Geospatial Distance Input:* A numerical input field specifying the *Distance to Downstream Town (km)* to determine early warning lead times.
+
+### 2. Cascading Multi-Hazard Simulation Engine (cascade_engine.py Integration)
+
+* *Stage 1 (Landslide Risk):* Calculates a unified Landslide Susceptibility Index by running mathematical risk logic on slope, rainfall, and seismic inputs.
+* *Stage 2 (Cascade Evaluation):* Evaluates if high landslide risk triggers a *River Blockage* (natural dam) given a fixed river proximity (100m).
+
+### 3. Dynamic Geospatial Risk Mapping (folium & streamlit-folium)
+
+* *Interactive Map Display:* Centers on the *Chamoli region (30.48, 79.33)* in the Himalayas with OpenStreetMap tiles.
+* *Risk-Adaptive Station Marker:* A CircleMarker that dynamically changes color based on risk severity:
+* 🔴 *Red:* Risk Index > 65%
+* 🟠 *Orange:* Risk Index 35% – 65%
+* 🟢 *Green:* Risk Index < 35%
+
+
+* *River Blockage Warning Marker:* Plots a black warning marker at [30.47, 79.34] when a natural dam forms.
+* *Flood Wave Trajectory Overlay:* Renders a bold blue PolyLine along downstream coordinates representing the predicted path of the flash flood wave.
+
+### 4. Early Warning Metrics & Alert System
+
+* *Landslide Risk Index Metric (st.metric):* Visual display of the percentage score paired with a dynamic status badge (HIGH RISK, MODERATE, LOW).
+* *Flash Flood Countdown Display:* Displays a live countdown (cascade_results['wave_arrival_mins']) indicating the estimated time before the flood surge reaches populated areas.
+* *Conditional Error/Alert Banners (st.error, st.warning):* Triggers urgent red alert banners detailing action protocols for the National Disaster Management Authority (NDMA).
+
+### 5. Structured Action & Readiness Output (st.json)
+
+* *Agency Dispatch Data:* Outputs a structured JSON object containing target sector details, active evacuation protocols (LEVEL 3 vs. STANDBY), and estimated lead times.
+
+---
+
+### Feature Summary Table
+
+| Category | Feature Component | Functional Purpose |
+| --- | --- | --- |
+| *Inputs* | Sidebar Sliders & Numerical Inputs | Adjust rainfall, slope, seismic activity, and downstream distance. |
+| *Logic* | Multi-Hazard Cascade Pipeline | Computes landslide risk index and checks for river blockage conditions. |
+| *Map Visuals* | Adaptive Circle Marker | Visualizes monitoring point status (Green, Orange, Red). |
+| *Map Visuals* | Trajectory PolyLine & Dam Marker | Draws river choke points and predicted downstream flash flood paths. |
+| *Alerts* | Risk Index & Arrival Time Metrics | Quantifies disaster metrics for emergency managers. |
+| *Alerts* | Dynamic Protocol Banner | Displays immediate NDMA evacuation recommendations. |
+| *Data Output* | Emergency Management JSON | Provides actionable payload for municipality authorities. |
